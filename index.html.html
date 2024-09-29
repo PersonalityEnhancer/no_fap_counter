@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Fap Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .counter {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #fff;
+            width: 250px;
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.reset {
+            background-color: #dc3545;
+        }
+        button.tempted {
+            background-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>No Fap Counter</h1>
+
+    <div id="counters">
+        <!-- Individual counters will be inserted here by JavaScript -->
+    </div>
+
+    <script>
+        // Sample list of friends (you can replace with real names)
+        const friends = ['Vishal', 'Raju'];
+
+        // Initialize counters, last update times, and tempted count
+        const counters = {};
+
+        function loadCounters() {
+            friends.forEach(friend => {
+                counters[friend] = {
+                    count: localStorage.getItem(friend + '_count') || 0,
+                    lastUpdated: localStorage.getItem(friend + '_lastUpdated') || null,
+                    temptedCount: localStorage.getItem(friend + '_temptedCount') || 0
+                };
+                createCounterElement(friend);
+            });
+        }
+
+        function createCounterElement(friend) {
+            const container = document.createElement('div');
+            container.className = 'counter';
+            container.id = friend;
+
+            const name = document.createElement('h2');
+            name.textContent = friend;
+
+            const countDisplay = document.createElement('p');
+            countDisplay.id = friend + '_count';
+            countDisplay.textContent = 'Days: ' + counters[friend].count;
+
+            const temptedDisplay = document.createElement('p');
+            temptedDisplay.id = friend + '_tempted';
+            temptedDisplay.textContent = 'Times Tempted: ' + counters[friend].temptedCount;
+
+            const incrementBtn = document.createElement('button');
+            incrementBtn.textContent = 'I made it today!';
+            incrementBtn.onclick = () => incrementCounter(friend);
+
+            const temptedBtn = document.createElement('button');
+            temptedBtn.textContent = 'Was Tempted';
+            temptedBtn.className = 'tempted';
+            temptedBtn.onclick = () => temptedCounter(friend);
+
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = 'I failed';
+            resetBtn.className = 'reset';
+            resetBtn.onclick = () => resetCounter(friend);
+
+            container.appendChild(name);
+            container.appendChild(countDisplay);
+            container.appendChild(temptedDisplay);
+            container.appendChild(incrementBtn);
+            container.appendChild(temptedBtn);
+            container.appendChild(resetBtn);
+
+            document.getElementById('counters').appendChild(container);
+        }
+
+        function incrementCounter(friend) {
+            const today = new Date().toLocaleDateString();
+            if (counters[friend].lastUpdated !== today) {
+                counters[friend].count++;
+                counters[friend].lastUpdated = today;
+
+                // Save to local storage
+                localStorage.setItem(friend + '_count', counters[friend].count);
+                localStorage.setItem(friend + '_lastUpdated', today);
+
+                // Update the UI
+                document.getElementById(friend + '_count').textContent = 'Days: ' + counters[friend].count;
+            } else {
+                alert(friend + ' has already logged today!');
+            }
+        }
+
+        function temptedCounter(friend) {
+            counters[friend].temptedCount++;
+
+            // Save tempted count to local storage
+            localStorage.setItem(friend + '_temptedCount', counters[friend].temptedCount);
+
+            // Update the UI
+            document.getElementById(friend + '_tempted').textContent = 'Times Tempted: ' + counters[friend].temptedCount;
+        }
+
+        function resetCounter(friend) {
+            counters[friend].count = 0;
+            counters[friend].lastUpdated = null;
+            counters[friend].temptedCount = 0;
+
+            // Save to local storage
+            localStorage.setItem(friend + '_count', counters[friend].count);
+            localStorage.setItem(friend + '_lastUpdated', counters[friend].lastUpdated);
+            localStorage.setItem(friend + '_temptedCount', counters[friend].temptedCount);
+
+            // Update the UI
+            document.getElementById(friend + '_count').textContent = 'Days: ' + counters[friend].count;
+            document.getElementById(friend + '_tempted').textContent = 'Times Tempted: ' + counters[friend].temptedCount;
+        }
+
+        // Load the counters on page load
+        loadCounters();
+    </script>
+
+</body>
+</html>
